@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Meme Generator</title>
+  <style>
+    body {
+      font-family: Arial;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px;
+      background: #fafafa;
+    }
+    h1 { color: #444; }
+    input, textarea, button {
+      width: 300px;
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    img { margin-top: 20px; max-width: 400px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>AI Meme Generator 🎭</h1>
+  <input type="text" id="headline" placeholder="Enter headline">
+  <textarea id="content" placeholder="Enter content"></textarea>
+  <button id="generate">Generate Meme</button>
+  <img id="meme" style="display:none;">
+  <a id="download" style="display:none;">Download Meme</a>
+
+  <script>
+    document.getElementById('generate').addEventListener('click', async () => {
+      const headline = document.getElementById('headline').value;
+      const content = document.getElementById('content').value;
+      const meme = document.getElementById('meme');
+      const download = document.getElementById('download');
+
+      meme.style.display = 'none';
+      download.style.display = 'none';
+
+      const response = await fetch('https://hook.us2.make.com/YOUR_WEBHOOK_URL', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({headline, content})
+      });
+      const data = await response.json();
+
+      meme.src = data.image_url;
+      meme.style.display = 'block';
+      download.href = data.image_url;
+      download.download = "meme.png";
+      download.textContent = "Download Meme";
+      download.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
