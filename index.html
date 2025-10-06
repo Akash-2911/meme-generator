@@ -6,78 +6,115 @@
   <title>AI Meme Generator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      margin: 0;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
     }
 
     .container {
       background: #fff;
-      padding: 20px 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 350px;
+      width: 380px;
+      padding: 30px 25px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
     }
 
-    input, textarea, button {
+    h1 {
+      font-size: 1.8em;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    p.subtitle {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: -5px;
+      margin-bottom: 15px;
+    }
+
+    input, textarea {
       width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #4e54c8;
+      box-shadow: 0 0 5px rgba(78, 84, 200, 0.4);
     }
 
     button {
-      background: #0078d7;
-      color: white;
+      width: 100%;
+      padding: 12px;
       border: none;
+      border-radius: 10px;
+      background: #4e54c8;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
       transition: background 0.3s;
     }
 
     button:hover {
-      background: #005fa3;
+      background: #363ac2;
     }
 
     #output {
-      margin-top: 20px;
+      margin-top: 25px;
     }
 
     img {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 15px;
       margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    a {
-      display: block;
-      margin-top: 8px;
-      color: #0078d7;
+    .actions {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 12px;
+    }
+
+    .actions a, .actions button {
+      background: #f2f2f2;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
       text-decoration: none;
-      font-weight: bold;
+      transition: 0.3s;
     }
 
-    a:hover {
-      text-decoration: underline;
+    .actions a:hover, .actions button:hover {
+      background: #e2e2e2;
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>AI Meme Generator 😄</h1>
+    <p class="subtitle">Type a headline and content to generate a fun meme!</p>
+
     <input type="text" id="headline" placeholder="Enter headline..." />
     <textarea id="content" rows="3" placeholder="Enter content..."></textarea>
     <button onclick="generateMeme()">Generate Meme</button>
@@ -92,14 +129,14 @@
       const output = document.getElementById('output');
 
       if (!headline || !content) {
-        output.innerHTML = "<p style='color:red;'>Please enter both headline and content!</p>";
+        output.innerHTML = "<p style='color:red;'>Please fill both fields!</p>";
         return;
       }
 
-      output.innerHTML = "<p>Generating your meme... Please wait ⏳</p>";
+      output.innerHTML = "<p>Generating your meme... ⏳</p>";
 
       try {
-        // 🔹 Replace this URL with your actual Make.com webhook URL
+        // 🔹 Replace with your Make.com webhook URL
         const webhookUrl = "https://hook.us2.make.com/y26li5xi3bf3hsask6l9fyxqasighoor";
 
         const response = await fetch(webhookUrl, {
@@ -113,17 +150,26 @@
         if (data.image_url) {
           output.innerHTML = `
             <p><b>Your Meme is Ready! 🎉</b></p>
-            <img src="${data.image_url}" alt="Generated Meme" />
-            <a href="${data.image_url}" download>Download Meme</a>
+            <img src="${data.image_url}" alt="Generated Meme" id="memeImg"/>
+            <div class="actions">
+              <a href="${data.image_url}" download>⬇️ Download</a>
+              <button onclick="copyImageLink('${data.image_url}')">📋 Copy Link</button>
+            </div>
           `;
         } else {
-          output.innerHTML = "<p style='color:red;'>No image URL received. Please check Make.com logs.</p>";
+          output.innerHTML = "<p style='color:red;'>No image received. Check Make scenario logs.</p>";
         }
 
       } catch (error) {
-        console.error("Error:", error);
-        output.innerHTML = "<p style='color:red;'>Something went wrong. Please try again.</p>";
+        console.error(error);
+        output.innerHTML = "<p style='color:red;'>Something went wrong. Try again later.</p>";
       }
+    }
+
+    function copyImageLink(url) {
+      navigator.clipboard.writeText(url)
+        .then(() => alert("✅ Image link copied to clipboard!"))
+        .catch(() => alert("❌ Failed to copy link."));
     }
   </script>
 </body>
