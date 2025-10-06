@@ -7,81 +7,124 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-      background: #f7f7f7;
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
     }
-    input, textarea, button {
-      width: 80%;
-      max-width: 400px;
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
     }
-    #meme {
-      margin-top: 30px;
-      display: none;
-    }
-    img {
-      max-width: 80%;
+
+    .container {
+      background: #fff;
+      padding: 20px 25px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
     }
+
+    input, textarea, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    a {
+      display: block;
+      margin-top: 8px;
+      color: #0078d7;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>AI Meme Generator 😄</h1>
+    <input type="text" id="headline" placeholder="Enter headline..." />
+    <textarea id="content" rows="3" placeholder="Enter content..."></textarea>
+    <button onclick="generateMeme()">Generate Meme</button>
 
-  <h1>🖼️ AI Meme Generator</h1>
-  <input id="headline" type="text" placeholder="Enter headline" /><br />
-  <textarea id="content" rows="4" placeholder="Enter meme content..."></textarea><br />
-  <button id="generate">Generate Meme</button>
-
-  <div id="meme">
-    <h3>Your Meme is Ready!</h3>
-    <img id="memeImage" src="" alt="Generated Meme" />
-    <br />
-    <a id="downloadLink" href="#" download>⬇️ Download Meme</a>
+    <div id="output"></div>
   </div>
 
   <script>
-    const webhookURL = "https://hook.us2.make.com/y26li5xi3bf3hsask6l9fyxqasighoor"; // Replace this with your Make webhook URL
-
-    document.getElementById("generate").addEventListener("click", async () => {
-      const headline = document.getElementById("headline").value;
-      const content = document.getElementById("content").value;
+    async function generateMeme() {
+      const headline = document.getElementById('headline').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const output = document.getElementById('output');
 
       if (!headline || !content) {
-        alert("Please fill both fields!");
+        output.innerHTML = "<p style='color:red;'>Please enter both headline and content!</p>";
         return;
       }
 
-      document.getElementById("generate").disabled = true;
-      document.getElementById("generate").innerText = "Generating...";
+      output.innerHTML = "<p>Generating your meme... Please wait ⏳</p>";
 
       try {
-        const response = await fetch(webhookURL, {
+        // 🔹 Replace this URL with your actual Make.com webhook URL
+        const webhookUrl = "https://hook.us2.make.com/y26li5xi3bf3hsask6l9fyxqasighoor";
+
+        const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ headline, content }),
+          body: JSON.stringify({ headline, content })
         });
 
         const data = await response.json();
 
         if (data.image_url) {
-          document.getElementById("meme").style.display = "block";
-          document.getElementById("memeImage").src = data.image_url;
-          document.getElementById("downloadLink").href = data.image_url;
+          output.innerHTML = `
+            <p><b>Your Meme is Ready! 🎉</b></p>
+            <img src="${data.image_url}" alt="Generated Meme" />
+            <a href="${data.image_url}" download>Download Meme</a>
+          `;
         } else {
-          alert("Failed to generate meme!");
+          output.innerHTML = "<p style='color:red;'>No image URL received. Please check Make.com logs.</p>";
         }
-      } catch (err) {
-        alert("Error connecting to Make.com: " + err.message);
+
+      } catch (error) {
+        console.error("Error:", error);
+        output.innerHTML = "<p style='color:red;'>Something went wrong. Please try again.</p>";
       }
-
-      document.getElementById("generate").disabled = false;
-      document.getElementById("generate").innerText = "Generate Meme";
-    });
+    }
   </script>
-
 </body>
 </html>
